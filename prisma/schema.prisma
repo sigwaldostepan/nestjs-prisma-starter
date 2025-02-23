@@ -1,23 +1,50 @@
 generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
-
-enum Room_Status {
-  AVAILABLE
-  RESERVATED
-}
-
-model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+    provider = "prisma-client-js"
+  }
+  
+  datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+  }
+  
+  enum Room_Status {
+    AVAILABLE
+    RESERVATED
+  }
+  
+  model Room {
+    id String @id @default(cuid())
+    room_building String @db.Char(1)
+    room_floor Int @db.Integer
+    room_code Int @db.Integer
+    status Room_Status
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+  
+    roomReservations Room_Reservation[]
+  }
+  
+  model User {
+    id String @id @default(cuid())
+    name String
+    email String @unique
+    password String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+  
+    roomReservations Room_Reservation[]
+  }
+  
+  model Room_Reservation {
+    id String @id @default(cuid())
+    roomId String
+    room Room @relation(fields: [roomId], references: [id])
+    userId String
+    user User @relation(fields: [userId], references: [id])
+    reservatedFor String
+    reservatedFrom DateTime
+    reservatedUntil DateTime
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+  }
